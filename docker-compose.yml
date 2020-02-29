@@ -2,14 +2,14 @@ version: "3"
 services:
   es01:
     container_name: elk-es01
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+    image: elasticsearch:7.6.0
     ports:
-      - 9200:9200
-      - 9300:9300
+      - 9201:9200
+      - 9301:9300
     restart: always
     environment:
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms1G -Xmx1G"
       # output host defind es01
       - node.name=es01
       - cluster.name=log-collect-cluster
@@ -30,21 +30,27 @@ services:
       memlock:
         soft: -1
         hard: -1
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     volumes:
       - $PWD/es/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
       - $PWD/es/es01/data:/usr/share/elasticsearch/data
       - $PWD/es/es01/logs:/usr/share/elasticsearch/logs
+    networks:
+      - elk
 
   es02:
     container_name: elk-es02
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+    image: elasticsearch:7.6.0
     ports:
-      - 9201:9200
-      - 9301:9300
+      - 9202:9200
+      - 9302:9300
     restart: always
     environment:
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms1G -Xmx1G"
       # output host defind es02
       - node.name=es02
       - cluster.name=log-collect-cluster
@@ -65,25 +71,38 @@ services:
       memlock:
         soft: -1
         hard: -1
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     volumes:
       - $PWD/es/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
       - $PWD/es/es02/data:/usr/share/elasticsearch/data
       - $PWD/es/es02/logs:/usr/share/elasticsearch/logs
+    networks:
+      - elk
 
   kibana:
     container_name: elk-kibana
-    image: docker.elastic.co/kibana/kibana:7.6.0
+    image: kibana:7.6.0
     links:
       - es01:es01
       - es02:es02
     ports:
       - 5601:5601
     restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     volumes:
       - $PWD/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    networks:
+      - elk
+
   logstash:
     container_name: elk-logstash
-    image: docker.elastic.co/logstash/logstash:7.6.0
+    image: logstash:7.6.0
     links:
       - es01:es01
       - es02:es02
@@ -92,14 +111,20 @@ services:
     environment:
       - LOG_DIR=/data/logs
     restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     volumes:
       - $PWD/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - $PWD/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
       - $PWD/logstash/data/:/usr/share/logstash/data/
+    networks:
+      - elk
 
   filebeat:
     container_name: elk-filebeat
-    image: docker.elastic.co/beats/filebeat:7.6.0
+    image: filebeat:7.6.0
     links:
       - es01:es01
       - es02:es02
@@ -114,3 +139,9 @@ services:
       - $PWD/filebeat/logs:/usr/share/filebeat/logs
       - /Users/ahrievil/data/logs/:/data/logs/
     command: 'filebeat run -e -E setup.kibana.host=kibana:5601 -E output.logstash.hosts=["logstash:5044"]'
+    networks:
+      - elk
+
+networks:
+  elk:
+    driver: bridge
