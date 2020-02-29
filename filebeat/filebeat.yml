@@ -44,7 +44,7 @@ output.logstash:
 setup:
   kibana:
     hosts: 'kibana:5601'
-    username: "kibana_system"
+    username: "beats_system"
     password: "1357qetu"
     protocol: "http"
   dashboards.enabled: true
