@@ -52,6 +52,12 @@
   bin/elasticsearch-setup-passwords interactive
   ```
   my all defaut password is "1357qetu"
+## security logstash
+  setup es and kibana
+  ```
+  docker-compose --compatibility -f docker-compose.yml up -d es01 es02 kibana
+  ```
+  [add role and user for logstash_writer](https://www.elastic.co/guide/en/logstash/current/ls-security.html)
 ## run stack
   ```
   docker-compose --compatibility -f docker-compose.yml up -d es01 es02 kibana logstash
