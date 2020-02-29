@@ -51,6 +51,7 @@
   ```
   bin/elasticsearch-setup-passwords interactive
   ```
+  my all defaut password is "1357qetu"
 ## run stack
   ```
   docker-compose --compatibility -f gateway.yml up -d es01 es02 kibana logstash
