@@ -27,3 +27,20 @@
         </layout>
     </appender>
 ```
+##setup elk stack monitoring in kibana
+
+ http://127.0.0.1:5601/app/monitoring
+
+##es config
+  set jvm heap config for the min es required
+  [official document for es jvm detail](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)
+  ```
+  -Xms2g 
+  -Xmx2g 
+  ```
+  dump path default $PWD/data  (/usr/share/elasticsearch/data)
+  gc log path default $PWD/logs (/usr/share/elasticsearch/log)
+  
+  max_file_descriptors config is importance for es running,[check the config is not greater than 65535](http://localhost:9200/_nodes/stats/process?filter_path=**.max_file_descriptors)
+  
+  bin/elasticsearch-setup-passwords interactive
