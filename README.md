@@ -54,7 +54,7 @@
   my all defaut password is "1357qetu"
 ## run stack
   ```
-  docker-compose --compatibility -f gateway.yml up -d es01 es02 kibana logstash
+  docker-compose --compatibility -f docker-compose.yml up -d es01 es02 kibana logstash
   ```
   filebeat is avaliable is this compose,but normally deploy on the other cluster
 
