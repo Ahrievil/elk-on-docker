@@ -137,7 +137,7 @@ services:
       - $PWD/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - $PWD/filebeat/data:/usr/share/filebeat/data
       - $PWD/filebeat/logs:/usr/share/filebeat/logs
-      - /Users/ahrievil/data/logs/:/data/logs/
+      - /data/logs/:/data/logs/
     command: 'filebeat run -e -E setup.kibana.host=kibana:5601 -E output.logstash.hosts=["logstash:5044"]'
     networks:
       - elk
