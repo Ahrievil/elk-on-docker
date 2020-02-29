@@ -1,0 +1,7 @@
+elasticsearch.hosts: ["http://es01:9200","http://es02:9200"]
+elasticsearch.username: "kibana"
+elasticsearch.password: "1357qetu"
+xpack.monitoring.ui.container.elasticsearch.enabled: true
+xpack.security.session.lifespan: "8h"
+xpack.security.encryptionKey: "iamfuckingmidwiththefuckingcompa"
+

@@ -1,0 +1,69 @@
+#filebeat.config:
+#  modules: #设置modules
+#    path: ${path.config}/modules.d/*.yml
+#    reload.enabled: false
+
+#filebeat.autodiscover:
+#  providers:
+#    - type: docker
+#      hints.enabled: true
+
+
+#processors:
+#- add_cloud_metadata: ~
+
+filebeat.inputs:
+  - type: log
+    paths:
+      - /data/logs/itl-message/*.log
+    encoding: utf-8
+
+    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    multiline.negate: true
+    multiline.match: after
+#    multiline.timeout: 5s #default value
+
+    exclude_files: ['\.gz$','\.access.log']
+
+    fields:
+      host_info_detail: ${HOSTNAME:-local}
+    fields_under_root: true
+    tags: 'intelligence'
+
+    include_lines: '^[0-9]{4}-[0-9]{2}-[0-9]{2}' #每个日志开头的行被当做收集对象
+
+
+#output.elasticsearch:
+#  hosts: 'es01:9200'
+#  username: '${ELASTICSEARCH_USERNAME:}'
+#  password: '${ELASTICSEARCH_PASSWORD:}'
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+setup:
+  kibana:
+    hosts: 'kibana:5601'
+    username: "kibana_system"
+    password: "1357qetu"
+    protocol: "http"
+  dashboards.enabled: true
+
+
+monitoring:
+  enabled: true
+  cluster_uuid: PRODUCTION_ES_CLUSTER_UUID
+  elasticsearch:
+    hosts: ["es01:9200","es02:9200"]
+    username: beats_system
+    password: 1357qetu
+
+queue.spool:
+  file:
+    path: "${path.data}/spool.dat"
+    size: 512MiB
+    page_size: 16KiB
+  write:
+    buffer_size: 10MiB
+    flush.timeout: 5s
+    flush.events: 1024

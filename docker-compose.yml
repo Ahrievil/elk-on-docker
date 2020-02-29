@@ -1,0 +1,116 @@
+version: "3"
+services:
+  es01:
+    container_name: elk-es01
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+    ports:
+      - 9200:9200
+      - 9300:9300
+    restart: always
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # output host defind es01
+      - node.name=es01
+      - cluster.name=log-collect-cluster
+      - cluster.initial_master_nodes=es01
+      - discovery.seed_hosts=es02
+      - xpack.security.enabled=true
+      # xpack is charge license
+      - xpack.security.audit.enabled=true
+      - xpack.monitoring.enabled=true
+      - xpack.monitoring.collection.enabled=true
+      - xpack.security.authc.realms.native.realm1.order=0
+
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.keystore.path=elastic-certificates.p12
+      - xpack.security.transport.ssl.truststore.path=elastic-certificates.p12
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - $PWD/es/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
+      - $PWD/es/es01/data:/usr/share/elasticsearch/data
+      - $PWD/es/es01/logs:/usr/share/elasticsearch/logs
+
+  es02:
+    container_name: elk-es02
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+    ports:
+      - 9201:9200
+      - 9301:9300
+    restart: always
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # output host defind es02
+      - node.name=es02
+      - cluster.name=log-collect-cluster
+      - cluster.initial_master_nodes=es01,es02
+      - discovery.seed_hosts=es01
+      - xpack.security.enabled=true
+      # xpack is charge license
+      - xpack.security.audit.enabled=true
+      - xpack.monitoring.enabled=true
+      - xpack.monitoring.collection.enabled=true
+      - xpack.security.authc.realms.native.realm1.order=0
+
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.keystore.path=elastic-certificates.p12
+      - xpack.security.transport.ssl.truststore.path=elastic-certificates.p12
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - $PWD/es/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
+      - $PWD/es/es02/data:/usr/share/elasticsearch/data
+      - $PWD/es/es02/logs:/usr/share/elasticsearch/logs
+
+  kibana:
+    container_name: elk-kibana
+    image: docker.elastic.co/kibana/kibana:7.6.0
+    links:
+      - es01:es01
+      - es02:es02
+    ports:
+      - 5601:5601
+    restart: always
+    volumes:
+      - $PWD/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+  logstash:
+    container_name: elk-logstash
+    image: docker.elastic.co/logstash/logstash:7.6.0
+    links:
+      - es01:es01
+      - es02:es02
+    ports:
+      - 5044:5044
+    environment:
+      - LOG_DIR=/data/logs
+    restart: always
+    volumes:
+      - $PWD/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - $PWD/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - $PWD/logstash/data/:/usr/share/logstash/data/
+
+  filebeat:
+    container_name: elk-filebeat
+    image: docker.elastic.co/beats/filebeat:7.6.0
+    links:
+      - es01:es01
+      - es02:es02
+      - kibana:kibana
+      - logstash:logstash
+    restart: always
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $PWD/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - $PWD/filebeat/data:/usr/share/filebeat/data
+      - $PWD/filebeat/logs:/usr/share/filebeat/logs
+      - /Users/ahrievil/data/logs/:/data/logs/
+    command: 'filebeat run -e -E setup.kibana.host=kibana:5601 -E output.logstash.hosts=["logstash:5044"]'
