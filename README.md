@@ -42,5 +42,19 @@
   gc log path default $PWD/logs (/usr/share/elasticsearch/log)
   
   max_file_descriptors config is importance for es running,[check the config is not greater than 65535](http://localhost:9200/_nodes/stats/process?filter_path=**.max_file_descriptors)
-  
+
+## set .security index for elastic stack security
+  ```
+  docker-compose up -d es01
+  ```
+  wait es setup and begin setting password for base users
+  ```
   bin/elasticsearch-setup-passwords interactive
+  ```
+## run stack
+  ```
+  docker-compose --compatibility -f gateway.yml up -d es01 es02 kibana logstash
+  ```
+  filebeat is avaliable is this compose,but normally deploy on the other cluster
+
+
