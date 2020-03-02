@@ -26,7 +26,7 @@ filebeat.inputs:
     exclude_files: ['\.gz$','\.access.log']
 
     fields:
-      host_info_detail: ${HOSTNAME:-local}
+      host_info_detail: ${HOSTHOME_INFO:-local}
     fields_under_root: true
     tags: 'intelligence'
 
