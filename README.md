@@ -57,6 +57,7 @@
   ```
   docker-compose --compatibility -f docker-compose.yml up -d es01 es02 kibana
   ```
+## add user logstash_writer for logstash output elasticsearch
   [add role and user for logstash_writer](https://www.elastic.co/guide/en/logstash/current/ls-security.html)
 ## run stack
   ```
