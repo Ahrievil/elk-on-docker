@@ -27,11 +27,11 @@
         </layout>
     </appender>
 ```
-##setup elk stack monitoring in kibana
+## setup elk stack monitoring in kibana
 
  http://127.0.0.1:5601/app/monitoring
 
-##es config
+## es config
   set jvm heap config for the min es required
   [official document for es jvm detail](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)
   ```
