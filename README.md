@@ -43,6 +43,7 @@
   
   max_file_descriptors config is importance for es running,[check the config is not greater than 65535](http://localhost:9200/_nodes/stats/process?filter_path=**.max_file_descriptors)
 
+  [config vm max map count](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html)
 ## set .security index for elastic stack security
   ```
   docker-compose up -d es01
