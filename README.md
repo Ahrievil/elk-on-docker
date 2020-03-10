@@ -66,4 +66,5 @@
   ```
   filebeat is avaliable is this compose,but normally deploy on the other cluster
 
-
+## config index removal schedule in kibana
+  create a policy in "index lifecycle policy" menu
