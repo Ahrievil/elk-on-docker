@@ -68,3 +68,6 @@
 
 ## config index removal schedule in kibana
   create a policy in "index lifecycle policy" menu
+
+## abort of geoip config and kibana maps
+  default geoip data config in index template is error,you should config the 'geoip.location' data structure,after this, remove you index in kibana,and refresh you fields in index patterns,ensure geoip.location data type is 'geo_point',after all this ,you can create a new map with right index with geoip location data
